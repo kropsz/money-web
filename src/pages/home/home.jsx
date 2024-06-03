@@ -20,22 +20,39 @@ const Home = () => {
       
       const navigate = useNavigate();
       const [despesas, setDespesas] = useState([])
+      const [total, setTotal] = useState(0);
 
-      const ListDespesas = () => {
-        setDespesas(dados);
+      const ListDespesas = (filtro) => {
+        let soma = 0
+        for (let dado of dados) {
+            soma += dado.valor;
+        }
+        setTotal(soma)
+        setDespesas(dados)
+
+
+    }
+      const OpenDespesa = (id) =>{
+        navigate("despesa/" + id)
+      }
+
+      const DeleteDespesa = (id) =>{
+        alert(id);
       }
 
       useEffect(() => {
         ListDespesas();
-      }) 
+      }, []) 
 
     return <>
         <Sidebar />
-        <Navbar />
+        <Navbar onClickSearch={ListDespesas} 
+                total={total}
+                search={true}/>
         <div className="container-home">
             <div className="title-home">
                 <h1>Despesas</h1>
-                <button onClick={() => navigate("/despesa")} className="btn btn-green">Adicionar despesas</button>
+                <button onClick={() => navigate("/despesa/add")} className="btn btn-green">Adicionar despesas</button>
             </div>
 
             <div className="box-despesas">
@@ -52,7 +69,7 @@ const Home = () => {
                     <tbody>
                        {
                         despesas.map((desp) => {
-                            return  <tr>
+                            return  <tr key={desp.id}>
                             <td>{desp.id}</td>
                             <td>{desp.descricao}</td>
                             <td>{desp.categoria}</td>
@@ -60,10 +77,16 @@ const Home = () => {
                                 {desp.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
                                 </td>
                             <td className="text-right">
-                                <button className="btn btn-blue">
+                                <button onClick={() =>{
+                                    OpenDespesa(desp.id)
+                                }} 
+                                    className="btn btn-blue">
                                     <img className="icon-sm" src={icons.edit} alt="" />
                                 </button>
-                                <button className="btn btn-red ml-10">
+                                <button onClick={() =>{
+                                    DeleteDespesa(desp.id)
+                                }} 
+                                    className="btn btn-red ml-10">
                                     <img className="icon-sm" src={icons.remove} alt="" />
                                 </button>
                             </td>
